@@ -3,13 +3,12 @@ import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDPIpVWB84XCO8jOKvBj2tNUg6b9pQJQkM",
-  authDomain: "welfare-c639a.firebaseapp.com",
-  projectId: "welfare-c639a",
-  storageBucket: "welfare-c639a.firebasestorage.app",
-  messagingSenderId: "166419770519",
-  appId: "1:166419770519:web:8e371175e5bcfd248e8dd2",
-  measurementId: "G-NCE3GGJXF5"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
 const app = initializeApp(firebaseConfig);
