@@ -183,7 +183,7 @@ const matchesSearch =
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-white ${
                         user.isAdmin ? 'bg-purple-500' : 'bg-blue-500'
                       }`}>
-                        {user?.displayName.toUpperCase()}
+                        {user?.displayName}
                       </div>
                       <div>
                         <div className="font-medium text-slate-800">{user.displayName}</div>
@@ -201,7 +201,7 @@ const matchesSearch =
                     {user.phone ? (
                       <div className="flex items-center gap-2 text-slate-700">
                         <Phone className="w-4 h-4 text-slate-400" />
-                        {user.phone}
+                        {user?.phone}
                       </div>
                     ) : (
                       <span className="text-slate-400">Not provided</span>
@@ -210,29 +210,29 @@ const matchesSearch =
                   <td className="p-4">
                     <div className="flex items-center gap-2">
                       <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                        user.isAdmin 
+                        user?.isAdmin 
                           ? 'bg-purple-100 text-purple-800' 
                           : 'bg-green-100 text-green-800'
                       }`}>
-                        {user.isAdmin ? 'Administrator' : 'User'}
+                        {user?.isAdmin ? 'Administrator' : 'User'}
                       </span>
                       <button
                         onClick={() => toggleAdminStatus(user)}
                         className={`p-1 rounded transition-colors ${
-                          user.isAdmin 
+                          user?.isAdmin 
                             ? 'text-purple-600 hover:bg-purple-50' 
                             : 'text-slate-400 hover:bg-slate-50'
                         }`}
-                        title={user.isAdmin ? 'Remove admin privileges' : 'Grant admin privileges'}
+                        title={user?.isAdmin ? 'Remove admin privileges' : 'Grant admin privileges'}
                       >
-                        {user.isAdmin ? <ShieldCheck className="w-4 h-4" /> : <Shield className="w-4 h-4" />}
+                        {user?.isAdmin ? <ShieldCheck className="w-4 h-4" /> : <Shield className="w-4 h-4" />}
                       </button>
                     </div>
                   </td>
                   <td className="p-4">
                     <div className="flex items-center gap-2 text-slate-600 text-sm">
                       <Calendar className="w-4 h-4" />
-                      {user.createdAt.toLocaleDateString()}
+                      {user?.createdAt.toLocaleDateString()}
                     </div>
                   </td>
                   <td className="p-4">
@@ -248,7 +248,7 @@ const matchesSearch =
                         <Edit className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => handleDeleteUser(user.id)}
+                        onClick={() => handleDeleteUser(user?.id)}
                         className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                         title="Delete User"
                       >
