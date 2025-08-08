@@ -293,16 +293,23 @@ const { user, loading: isAdmin } = useAuth();
   }
   }, [user, isAdmin]);
 
-  const addUser = async (userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'>) => {
-    try {
-      await usersService.addUser(userData);
-      toast.success('User added successfully!');
-    } catch (error) {
-      console.error('Error adding user:', error);
-      toast.error('Failed to add user');
-      throw error;
-    }
-  };
+const addUser = async (userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'>) => {
+  try {
+    await usersService.addUser({
+      ...userData,
+      settings: {
+        defaultCurrency: 'PKR',
+        theme: 'system',
+        notificationsEnabled: true,
+      },
+    });
+    toast.success('User added successfully!');
+  } catch (error) {
+    console.error('Error adding user:', error);
+    toast.error('Failed to add user');
+    throw error;
+  }
+};
 
   const updateUser = async (id: string, userData: Partial<User>) => {
     try {

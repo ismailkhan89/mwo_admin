@@ -183,7 +183,7 @@ const matchesSearch =
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-white ${
                         user.isAdmin ? 'bg-purple-500' : 'bg-blue-500'
                       }`}>
-                        {user.displayName.charAt(0).toUpperCase()}
+                        {user?.displayName.toUpperCase()}
                       </div>
                       <div>
                         <div className="font-medium text-slate-800">{user.displayName}</div>
