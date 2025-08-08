@@ -561,12 +561,14 @@ subscribeToUsers(
   callback: (users: User[]) => void
 ) {
   const usersRef = collection(db, 'users');
-
-const q = isAdmin
-  ? query(usersRef) // no orderBy
-  : query(usersRef, where('__name__', '==', currentUserId));
+console.log('Subscribing to users for currentUserId:', currentUserId, 'isAdmin:', isAdmin);
+const q =  query(usersRef)
+  // ? query(usersRef) // no orderBy
+  // : query(usersRef, where('__name__', '==', currentUserId));
 
   return onSnapshot(q, (querySnapshot) => {
+    console.log("Query snapshot size:", querySnapshot.size);
+console.log("Docs received:", querySnapshot.docs.map(doc => doc.id));
     const users = querySnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),

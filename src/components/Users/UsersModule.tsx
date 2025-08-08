@@ -10,11 +10,16 @@ const UsersModule: React.FC = () => {
   const [editingUser, setEditingUser] = useState<UserType | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState('');
-
+console.log("users>>>>", users);
   const filteredUsers = users.filter(user => {
-    const matchesSearch = user.displayName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (user.phone && user.phone.includes(searchTerm));
+    // const matchesSearch = user?.displayName.toLowerCase().includes(searchTerm?.toLowerCase()) ||
+    //                      user?.email?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
+    //                      (user?.phone && user?.phone.includes(searchTerm));
+
+const matchesSearch =
+  (user?.displayName?.toLowerCase().includes(searchTerm)) ||
+  (user?.email?.toLowerCase().includes(searchTerm)) ||
+  (user?.phone?.includes(searchTerm));
     const matchesRole = !filterRole || 
                        (filterRole === 'admin' && user.isAdmin) ||
                        (filterRole === 'user' && !user.isAdmin);

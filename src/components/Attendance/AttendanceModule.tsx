@@ -18,6 +18,7 @@ const AttendanceModule: React.FC<AttendanceModuleProps> = ({ students }) => {
     const matchesSection = !selectedSection || student.section === selectedSection;
     return matchesGrade && matchesSection;
   });
+  console.log('selectedDate students:', selectedDate);
 
   const todayAttendance = attendance[selectedDate] || {};
 
@@ -69,7 +70,7 @@ const AttendanceModule: React.FC<AttendanceModuleProps> = ({ students }) => {
       </div>
     );
   }
-
+console.log('selectedDate:', selectedDate);
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -198,12 +199,13 @@ const AttendanceModule: React.FC<AttendanceModuleProps> = ({ students }) => {
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="p-4 bg-slate-50 border-b border-slate-200">
           <h3 className="text-lg font-semibold text-slate-800">
-            Attendance for {new Date(selectedDate).toLocaleDateString('en-US', { 
+            Attendance for {selectedDate}
+            {/* {new Date(selectedDate).toLocaleDateString('en-US', { 
               weekday: 'long', 
               year: 'numeric', 
               month: 'long', 
               day: 'numeric' 
-            })}
+            })} */}
           </h3>
         </div>
         

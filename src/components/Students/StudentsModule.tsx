@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Plus, Search, Filter, Edit, Trash2, Eye } from 'lucide-react';
 import { Student } from '../../types';
-import { useStudents } from '../../hooks/useFirestore';
+import { useStudents, useUsers } from '../../hooks/useFirestore';
 import StudentForm from './StudentForm';
 import StudentDetails from './StudentDetails';
-
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import logo from '../../../assets/logo.png'; // adjust the path to your logo
 const StudentsModule: React.FC = () => {
   const { students, loading, addStudent, updateStudent, deleteStudent } = useStudents();
   const [showForm, setShowForm] = useState(false);
@@ -15,6 +17,11 @@ const StudentsModule: React.FC = () => {
   const [filterGrade, setFilterGrade] = useState('');
   const [filterWelfare, setFilterWelfare] = useState('');
 
+  const [filterCreatedBy, setFilterCreatedBy] = useState('');
+
+  const { users } = useUsers();
+  console.log('useUsers hook called useUsers', users);
+  const userMap = Object.fromEntries(users.map(user => [user.id, user.displayName]));
   const filteredStudents = students.filter(student => {
     const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          student.rollNumber.includes(searchTerm) ||
@@ -23,8 +30,8 @@ const StudentsModule: React.FC = () => {
     const matchesWelfare = !filterWelfare || 
                           (filterWelfare === 'welfare' && student.isWelfare) ||
                           (filterWelfare === 'regular' && !student.isWelfare);
-    
-    return matchesSearch && matchesGrade && matchesWelfare;
+     const matchesCreatedBy = !filterCreatedBy || student.createdBy === filterCreatedBy;
+  return matchesSearch && matchesGrade && matchesWelfare && matchesCreatedBy;
   });
 
   const handleAddStudent = (studentData: Omit<Student, 'id'>) => {
@@ -45,8 +52,63 @@ const StudentsModule: React.FC = () => {
       deleteStudent(id);
     }
   };
+  const getImageBase64 = (url: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'Anonymous';
+    img.src = url;
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      canvas.getContext('2d')!.drawImage(img, 0, 0);
+      resolve(canvas.toDataURL('image/png'));
+    };
+    img.onerror = reject;
+  });
+};
+
+const exportToPDF = async () => {
+  const doc = new jsPDF();
+
+  const logoBase64 = await getImageBase64(logo);
+
+  doc.addImage(logoBase64, 'PNG', 10, 10, 25, 25);
+
+  // ✅ Convert UID to name
+  const creator = users.find((u) => u.id === filterCreatedBy);
+  const createdByText = `Created By: ${creator?.displayName || 'All'}`;
+
+  doc.setFontSize(10);
+  const textWidth = doc.getTextWidth(createdByText);
+  doc.text(createdByText, doc.internal.pageSize.getWidth() - textWidth - 10, 15);
+
+  doc.setFontSize(16);
+  doc.text('Filtered Students Report', 14, 45);
+
+  autoTable(doc, {
+    startY: 50,
+    head: [['Name', 'Roll No.', 'Grade/Section', 'Parent', 'Contact', 'Status', 'Welfare']],
+    body: filteredStudents.map((s) => [
+      s.name,
+      s.rollNumber,
+      `${s.grade}-${s.section}`,
+      s.parentName,
+      s.contactNumber,
+      s.feeStatus ? 'Paid' : 'Pending',
+      s.isWelfare ? 'Yes' : 'No'
+    ]),
+    styles: {
+      fontSize: 10,
+    },
+  });
+
+  doc.save('students-report.pdf');
+};
+
 
   const uniqueGrades = Array.from(new Set(students.map(s => s.grade))).sort();
+  const uniqueCreators = Array.from(new Set(students.map(s => s.createdBy)));
 
   if (loading) {
     return (
@@ -101,11 +163,17 @@ const StudentsModule: React.FC = () => {
           <Plus className="w-4 h-4" />
           Add Student
         </button>
+<button
+  onClick={exportToPDF}
+  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+>
+  Export PDF
+</button>
       </div>
 
       {/* Filters */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
             <input
@@ -136,6 +204,18 @@ const StudentsModule: React.FC = () => {
             <option value="">All Students</option>
             <option value="welfare">Welfare Students</option>
             <option value="regular">Regular Students</option>
+          </select>
+
+          <select
+            value={filterCreatedBy}
+            onChange={(e) => setFilterCreatedBy(e.target.value)}
+            className="px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="">All Creators</option>
+            {uniqueCreators.map(uid => (
+                <option key={uid} value={uid}>{userMap[uid] || uid}</option>
+
+            ))}
           </select>
 
           <div className="flex items-center gap-2 text-sm text-slate-600">

@@ -66,4 +66,5 @@ export interface User {
   isAdmin: boolean;
   createdAt: Date;
   updatedAt: Date;
+  password?: string; // Optional for user creation
 }

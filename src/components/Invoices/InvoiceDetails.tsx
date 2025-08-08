@@ -1,18 +1,25 @@
-import React from 'react';
-import { ArrowLeft, Edit, Mail, Calendar, FileText } from 'lucide-react';
+import React, { useEffect, useRef } from 'react';
+import { ArrowLeft, Edit, Mail, Calendar, FileText, Download } from 'lucide-react';
 import { Invoice } from '../../types';
-
+import html2pdf from 'html2pdf.js'; // 📦 PDF library
 interface InvoiceDetailsProps {
   invoice: Invoice;
   onClose: () => void;
   onEdit: () => void;
 }
+import logo from '../../../assets/logo.png'; // 🆕 Import logo for watermark
 
 const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ invoice, onClose, onEdit }) => {
+  const invoiceRef = useRef<HTMLDivElement>(null); // 🆕 Ref for PDF section
+
+//   useEffect(() => {
+//   handleDownloadPDF(); // 🚫 Runs before DOM is ready
+// }, []);
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'paid':
-        return 'bg-green-500 text-white';
+        return 'bg-green-500 text-white';        // ...existing code...
+       
       case 'sent':
         return 'bg-blue-500 text-white';
       case 'overdue':
@@ -22,8 +29,29 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ invoice, onClose, onEdi
     }
   };
 
+
+const handleDownloadPDF = () => {
+  if (!invoiceRef.current) {
+    console.warn('Invoice DOM not ready yet');
+    return;
+  }
+
+  html2pdf()
+    .set({
+      margin: 0.5,
+      filename: `${invoice.invoiceNumber}_invoice.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+    })
+    .from(invoiceRef.current)
+    .save();
+};
   return (
     <div className="p-6 space-y-6">
+          {/* Logo and Title */}
+
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -43,9 +71,45 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ invoice, onClose, onEdi
           Edit Invoice
         </button>
       </div>
+        <div className="flex gap-3">
+          <button
+            onClick={handleDownloadPDF}
+            className="bg-slate-600 hover:bg-slate-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+          >
+            <Download className="w-4 h-4" />
+            Download as PDF
+          </button>
+          <button
+            onClick={onEdit}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+          >
+            <Edit className="w-4 h-4" />
+            Edit Invoice
+          </button>
+        </div>
 
       {/* Invoice Card */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div ref={invoiceRef} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden relative">
+        {/* Watermark Logo */}
+        <img
+          src={logo} // Adjust path if needed
+          alt="Logo Watermark"
+          className="absolute inset-0 w-2/3 h-2/3 object-contain opacity-10 pointer-events-none m-auto"
+          style={{ left: '0', right: '0', top: '0', bottom: '0' }}
+        />
+        {/* Logo and Title Row */}
+          <div className="flex items-center mb-4 ml-6 mt-6">
+            <img
+              src={logo}
+              alt="Logo"
+              className="w-16 h-16 object-contain mr-3"
+            />
+            <h2 className="text-lg font-semibold text-slate-800">
+              Minzai Welfare Organization <br className="hidden sm:block" />
+
+                 <span className="text-sm font-normal">Registration # DSW (4422)-K</span>
+            </h2>
+          </div>
         {/* Header Section */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6 text-white">
           <div className="flex items-start justify-between">
@@ -186,8 +250,8 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ invoice, onClose, onEdi
                 <span className="ml-2 text-slate-800">{invoice.createdAt.toLocaleDateString()}</span>
               </div>
               <div>
-                <span className="text-slate-600">Last Updated:</span>
-                <span className="ml-2 text-slate-800">{invoice.updatedAt.toLocaleDateString()}</span>
+                <span className="text-slate-600">Address:</span>
+                <span className="ml-2 text-slate-800">4th Floor House#1 Metroville #1 S.I.T.E Town Karachi</span>
               </div>
             </div>
           </div>

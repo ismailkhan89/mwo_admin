@@ -27,6 +27,7 @@ export const useAuth = () => {
         try {
           const adminStatus = await authService.isAdmin();
                 console.log('Auth state changed:', adminStatus);
+                
           setIsAdmin(adminStatus);
         } catch (error) {
           console.error('Error checking admin status:', error);
